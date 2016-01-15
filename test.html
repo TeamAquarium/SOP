@@ -6,26 +6,60 @@
  <title>SOP Test</title>
  <meta charset="utf-8" />
 <script type="text/javascript">
-var dead = [];
+var alive = [];
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
+function getIp() {
+ window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;   //compatibility for firefox and chrome
+    var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};      
+    pc.createDataChannel("");    //create a bogus data channel
+    pc.createOffer(pc.setLocalDescription.bind(pc), noop);    // create offer and set local description
+    pc.onicecandidate = function(ice){  //listen for candidate events
+        if(!ice || !ice.candidate || !ice.candidate.candidate)  return;
+        var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){2}\.)/.exec(ice.candidate.candidate)[1];
+        pc.onicecandidate = noop;
+	start(myIP);
+    };
+}
+getIp();
+
+
+
 
 function doScan(proto,ip)
 {
+ var tim = 0;
  var x = new XMLHttpRequest();
- x.open("GET", proto+"://"+ip+"/");
- x.timeout = 6000;
- x.ontimeout = function(){ dead.push(ip); } 
- try
- {
-  x.send();
+ x.open("HEAD", proto+"://"+ip+":445/", true);
+ x.timeout = 900;
+ x.onreadystatechange = function () {
+	if(x.readyState == 4) {
+		tim = performance.now() - tim; 
+		if(tim < 900) {
+			console.log("Server " + ip + " UP!");
+			var value = document.getElementById("alivetext").innerHTML;
+			document.getElementById("alivetext").innerHTML = value + " " + ip;
+			
+		}
+	}
+	alive.push(ip); 
+} 
+ try {
+	tim = performance.now();
+	x.send();
  } catch (e) {};
 }
-
-function start()
-{
- var i;
- for (i = 1; i < 255; i++)
- {
-  doScan("http", "192.168.2."+i);
+function start(ip) {
+ for (i = 1; i < 255; i++) {
+	doScan("http", ip+i);
  }
 }
 
@@ -33,7 +67,7 @@ function start()
 </head>
 
 <body>
- <input type="button" value="Start!" onclick="start()" />
+<textarea cols="100" rows="20" id="alivetext"></textarea>
 </body>
 
 </html>
