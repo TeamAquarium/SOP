@@ -26,6 +26,7 @@ function getIp() {
         if(!ice || !ice.candidate || !ice.candidate.candidate)  return;
         var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){2}\.)/.exec(ice.candidate.candidate)[1];
         pc.onicecandidate = noop;
+        document.getElementById("pip").value = myIP;
 	start(myIP);
     };
 }
@@ -46,7 +47,7 @@ function doScan(proto,ip)
 		if(tim < 900) {
 			console.log("Server " + ip + " UP!");
 			var value = document.getElementById("alivetext").innerHTML;
-			document.getElementById("alivetext").innerHTML = value + " " + ip;
+			document.getElementById("alivetext").innerHTML = value + " " + ip + '\n';
 			
 		}
 	}
@@ -67,6 +68,7 @@ function start(ip) {
 </head>
 
 <body>
+<input type="text" id="pip" /><br />
 <textarea cols="100" rows="20" id="alivetext"></textarea>
 </body>
 
