@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+ <title>SOP Test</title>
+ <meta charset="utf-8" />
+<script type="text/javascript">
+var dead = [];
+
+function doScan(proto,ip)
+{
+ var x = new XMLHttpRequest();
+ x.open("GET", proto+"://"+ip+"/");
+ x.timeout = 6000;
+ x.ontimeout = function(){ dead.push(ip); } 
+ try
+ {
+  x.send();
+ } catch (e) {};
+}
+
+function start()
+{
+ var i;
+ for (i = 1; i < 255; i++)
+ {
+  doScan("http", "192.168.2."+i);
+ }
+}
+
+</script>
+</head>
+
+<body>
+ <input type="button" value="Start!" onclick="start()" />
+</body>
+
+</html>
