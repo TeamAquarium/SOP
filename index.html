@@ -6,17 +6,6 @@
  <title>SOP Test</title>
  <meta charset="utf-8" />
 <script type="text/javascript">
-var alive = [];
-
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
-
 function getIp() {
  window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;   //compatibility for firefox and chrome
     var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};      
@@ -26,14 +15,11 @@ function getIp() {
         if(!ice || !ice.candidate || !ice.candidate.candidate)  return;
         var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){2}\.)/.exec(ice.candidate.candidate)[1];
         pc.onicecandidate = noop;
-        document.getElementById("pip").value = myIP;
 	start(myIP);
     };
 }
+
 getIp();
-
-
-
 
 function doScan(proto,ip)
 {
@@ -45,31 +31,47 @@ function doScan(proto,ip)
 	if(x.readyState == 4) {
 		tim = performance.now() - tim; 
 		if(tim < 900) {
-			console.log("Server " + ip + " UP!");
-			var value = document.getElementById("alivetext").innerHTML;
-			document.getElementById("alivetext").innerHTML = value + " " + ip + '\n';
-			
+			document.getElementById('ip'+ip).className = "UP";
 		}
-	}
-	alive.push(ip); 
+	} 
+}
+ x.ontimeout = function () {
+	document.getElementById('ip'+ip).className = "DOWN";
 } 
  try {
 	tim = performance.now();
 	x.send();
  } catch (e) {};
 }
+
 function start(ip) {
+ var content = document.body.innerHTML;
  for (i = 1; i < 255; i++) {
+	content = document.body.innerHTML = content + '<div id="ip' + ip+i + '">' + ip+i + '</div>';
 	doScan("http", ip+i);
  }
 }
 
+function show() {
+ var divs = document.getElementsByTagName("div");
+ for(var i = 0; i < divs.length; i++) {
+	divs[i].style.display = 'inline-block';
+ }
+ document.getElementsByTagName("input")[0].style.display = 'none';
+}
 </script>
+<style type="text/css">
+ body { background-color : #cacaca; text-align : center; }
+ div { display : inline-block; width : 120px; border : solid 1px; color : white; padding : 15px; margin : 3px; border-radius : 3px; font-weight : bold; transition: background-color 3s; box-shadow: 0 0 10px #111 inset, 0 0 3px #000; }
+ .UP { display : inline-block; background-color : green; }
+ .UP:hover { background-image: radial-gradient(lightgreen, transparent); }
+ .DOWN { display : none; background-color : brown; }
+ .DOWN:hover { background-image: radial-gradient(red, transparent); }
+</style>
 </head>
 
 <body>
-<input type="text" id="pip" /><br />
-<textarea cols="100" rows="20" id="alivetext"></textarea>
+ <input type="checkbox" id="down" onclick="show();" /><br />
 </body>
 
 </html>
