@@ -32,11 +32,13 @@ function doScan(proto,ip)
 		tim = performance.now() - tim; 
 		if(tim < 900) {
 			document.getElementById('ip'+ip).className = "UP";
+			document.getElementById('ip'+ip).innerHTML = document.getElementById('ip'+ip).innerHTML + '<span>' + Math.round(tim) + 'ms</span>';
 		}
 	} 
 }
  x.ontimeout = function () {
 	document.getElementById('ip'+ip).className = "DOWN";
+	document.getElementById('ip'+ip).innerHTML = document.getElementById('ip'+ip).innerHTML + '<span>' + Math.round(tim) + 'ms - timeout</span>';
 } 
  try {
 	tim = performance.now();
@@ -52,26 +54,33 @@ function start(ip) {
  }
 }
 
-function show() {
- var divs = document.getElementsByTagName("div");
- for(var i = 0; i < divs.length; i++) {
-	divs[i].style.display = 'inline-block';
+function toggle() {
+ var show = document.getElementsByTagName("input")[0].checked;
+ var downDivs = document.getElementsByClassName("DOWN");
+ if(show) {
+ 	for(var i = 0; i < downDivs.length; i++) {
+		downDivs[i].style.display = 'inline-block';
+ 	}
+ } else {
+ 	for(var i = 0; i < downDivs.length; i++) {
+		downDivs[i].style.display = 'none';
+ 	}
  }
- document.getElementsByTagName("input")[0].style.display = 'none';
 }
 </script>
 <style type="text/css">
  body { background-color : #cacaca; text-align : center; }
- div { display : inline-block; width : 120px; border : solid 1px; color : white; padding : 15px; margin : 3px; border-radius : 3px; font-weight : bold; transition: background-color 3s; box-shadow: 0 0 10px #111 inset, 0 0 3px #000; }
- .UP { display : inline-block; background-color : green; }
+ div { display : inline-block; width : 120px; height : 20px; border : solid 1px; color : white; padding : 15px; margin : 3px; border-radius : 6px; font-weight : bold; transition: background-color 3s; box-shadow: 0 0 10px #111 inset, 0 0 3px #000; }
+ .UP { display : inline-block; height : 30px; background-color : green; }
  .UP:hover { background-image: radial-gradient(lightgreen, transparent); }
- .DOWN { display : none; background-color : brown; }
+ .DOWN { display : none; height : 30px; background-color : brown; }
  .DOWN:hover { background-image: radial-gradient(red, transparent); }
+div span { display : block; font-size : 8pt; }
 </style>
 </head>
 
 <body>
- <input type="checkbox" id="down" onclick="show();" /><br />
+ <input type="checkbox" id="down" onclick="toggle();" /><br />
 </body>
 
 </html>
